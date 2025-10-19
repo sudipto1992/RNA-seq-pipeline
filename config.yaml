@@ -1,0 +1,53 @@
+
+samples:
+  - 13187-SP-0001_WT_Ctrl1
+  - 13187-SP-0005_8C_KO_Ctrl1
+
+## Gtf input
+gtf_file: "annotation/gencode.vM32.annotation.gtf"
+
+## Reference genome
+genome: "genome/GRCm39.genome.fa"
+
+## Check if initial files are compressed (.gz)
+iscompressed: True
+
+## Check if your is a fastq or a BAM
+from_fastq: True
+
+## Check quality of fastq
+## FastQC and MultiQC check
+
+gen_fastqc: True
+gen_multiqc: True
+
+## trim adapter
+runtrimming: True
+
+## Parameters for trimmomatic
+## Adapter file
+#trimmomatic_adapter: "TruSeq3-PE.fa"
+
+## Trimming options
+trimmotatic_minlen: 30
+
+## Genome annotation and indexing
+## Genome annotation includes generating exon and splice sites
+genome_anno: True
+
+genome_build: True
+genome_index_dir: "genome_build"
+
+## Alignment
+
+use_hisat: True
+use_star: False
+
+## Count table generation
+
+use_featurecount: True
+use_htseq: False
+
+## deseq2 
+
+use_deseq: False
