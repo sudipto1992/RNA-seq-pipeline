@@ -1,6 +1,10 @@
 
 Guide to run this RNASeq pipeline.
 
+Download SRR from NCBI SRA archive: 
+    1. To enable, make sure you have the list of SRR in SRR_Acc_List.txt
+    2. Flag downloadSRR: True
+    3. If you fetching input files from SRR, flag iscompressed: False, because input srr files are automatically converted to fastq.
 
 Current Pipeline:
 
