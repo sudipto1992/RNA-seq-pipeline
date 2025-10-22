@@ -13,15 +13,18 @@ os.makedirs("genome_build", exist_ok=True)
 
 # QC steps
 target = []
+if config["downloadSRR"]:
+    target+=expand("fastq_input/{sample}_1.fastq",sample=SAMPLES),
+    target+=expand("fastq_input/{sample}_2.fastq",sample=SAMPLES)
 if config["iscompressed"]:
-    target+=expand("fastq_input/{sample}_R1.fastq",sample=SAMPLES),
-    target+=expand("fastq_input/{sample}_R2.fastq",sample=SAMPLES)
+    target+=expand("fastq_input/{sample}_1.fastq",sample=SAMPLES),
+    target+=expand("fastq_input/{sample}_2.fastq",sample=SAMPLES)
 if config['runtrimming']:
-    target+=expand("trimmed/{sample}_R1_paired.fastq",sample=SAMPLES),
-    target+=expand("trimmed/{sample}_R2_paired.fastq",sample=SAMPLES)
+    target+=expand("trimmed/{sample}_1_paired.fastq",sample=SAMPLES),
+    target+=expand("trimmed/{sample}_2_paired.fastq",sample=SAMPLES)
 if config["gen_fastqc"]:
-    target+=expand("fastqc/{sample}_R1_paired_fastqc.html",sample=SAMPLES),
-    target+=expand("fastqc/{sample}_R2_paired_fastqc.html",sample=SAMPLES)
+    target+=expand("fastqc/{sample}_1_paired_fastqc.html",sample=SAMPLES),
+    target+=expand("fastqc/{sample}_2_paired_fastqc.html",sample=SAMPLES)
 if config["gen_multiqc"]:
     target.append("multiqc/multiqc_report.html")
 if config["genome_anno"]:
@@ -41,13 +44,26 @@ rule all:
         target
 
 # local rules for steps
+rule downloadSRR:
+    output:
+        R1="fastq_input/{sample}_1.fastq.gz",
+        R2="fastq_input/{sample}_2.fastq.gz"
+    log:
+        "log/datacol_{sample}.log"
+    conda:
+        "envs/QC.yaml"
+    shell:
+        """
+        set -x
+        bash ./code/srr_download.sh
+        """
 rule is_compressed:
     input:
-        P1="fastq_input/{sample}_R1.fastq.gz",
-        P2="fastq_input/{sample}_R2.fastq.gz"
+        P1="fastq_input/{sample}_1.fastq.gz",
+        P2="fastq_input/{sample}_2.fastq.gz"
     output:
-        R1="fastq_input/{sample}_R1.fastq",
-        R2="fastq_input/{sample}_R2.fastq"
+        R1="fastq_input/{sample}_1.fastq",
+        R2="fastq_input/{sample}_2.fastq"
     log:
         "log/unzip_{sample}.log"
     shell:
@@ -59,13 +75,13 @@ rule is_compressed:
 
 rule run_trimmomatic:
     input:
-        R1="fastq_input/{sample}_R1.fastq",
-        R2="fastq_input/{sample}_R2.fastq"
+        R1="fastq_input/{sample}_1.fastq",
+        R2="fastq_input/{sample}_2.fastq"
     output:
-        R1_paired="trimmed/{sample}_R1_paired.fastq",
-        R1_unpaired="trimmed/{sample}_R1_unpaired.fastq",
-        R2_paired="trimmed/{sample}_R2_paired.fastq",
-        R2_unpaired="trimmed/{sample}_R2_unpaired.fastq"
+        R1_paired="trimmed/{sample}_1_paired.fastq",
+        R1_unpaired="trimmed/{sample}_1_unpaired.fastq",
+        R2_paired="trimmed/{sample}_2_paired.fastq",
+        R2_unpaired="trimmed/{sample}_2_unpaired.fastq"
     params:
         adapters="TruSeq3-PE.fa",
         minlen=config["trimmotatic_minlen"]
@@ -88,11 +104,11 @@ rule run_trimmomatic:
     
 rule gen_fastqc:
     input:
-        P1="trimmed/{sample}_R1_paired.fastq",
-        P2="trimmed/{sample}_R2_paired.fastq"
+        P1="trimmed/{sample}_1_paired.fastq",
+        P2="trimmed/{sample}_2_paired.fastq"
     output:
-        R1="fastqc/{sample}_R1_paired_fastqc.html",
-        R2="fastqc/{sample}_R2_paired_fastqc.html"
+        R1="fastqc/{sample}_1_paired_fastqc.html",
+        R2="fastqc/{sample}_2_paired_fastqc.html"
     log:
         "log/qc_{sample}.log"
     conda:
@@ -106,8 +122,8 @@ rule gen_fastqc:
 
 rule gen_multiqc:
     input:
-        expand("fastqc/{sample}_R1_paired_fastqc.html",sample=SAMPLES),
-        expand("fastqc/{sample}_R2_paired_fastqc.html",sample=SAMPLES)
+        expand("fastqc/{sample}_1_paired_fastqc.html",sample=SAMPLES),
+        expand("fastqc/{sample}_2_paired_fastqc.html",sample=SAMPLES)
     output:
         "multiqc/multiqc_report.html"
     log:
@@ -157,8 +173,8 @@ rule genome_build:
 
 rule use_hisat:
     input:
-        P1="trimmed/{sample}_R1_paired.fastq",
-        P2="trimmed/{sample}_R2_paired.fastq",
+        P1="trimmed/{sample}_1_paired.fastq",
+        P2="trimmed/{sample}_2_paired.fastq",
         idx = config["genome_index_dir"]+"/genome.1.ht2"
     output:
         o1 = "final/aligned_{sample}.bam"
