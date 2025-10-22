@@ -1,28 +1,30 @@
 
+downloadSRR: True
+
 samples:
-  - 13187-SP-0001_WT_Ctrl1
-  - 13187-SP-0005_8C_KO_Ctrl1
+  - SRR24597727
 
 ## Gtf input
-gtf_file: "annotation/gencode.vM32.annotation.gtf"
+gtf_file: "annotation/XENLA_10.1_Xenbase_2025-09-15.gtf"
 
 ## Reference genome
-genome: "genome/GRCm39.genome.fa"
+genome: "genome/XENLA_10.1_genome.fa"
 
 ## Check if initial files are compressed (.gz)
-iscompressed: True
+## Flag this True if your downloadSRR is False and your input files are in .gz format
+iscompressed: False
 
-## Check if your is a fastq or a BAM
+## Check if your input is a fastq or a BAM
 from_fastq: True
+
+## trim adapter
+runtrimming: True
 
 ## Check quality of fastq
 ## FastQC and MultiQC check
 
 gen_fastqc: True
 gen_multiqc: True
-
-## trim adapter
-runtrimming: True
 
 ## Parameters for trimmomatic
 ## Adapter file
@@ -47,6 +49,11 @@ use_star: False
 
 use_featurecount: True
 use_htseq: False
+
+## Calculate TPM
+
+calc_tpm: False
+
 
 ## deseq2 
 
