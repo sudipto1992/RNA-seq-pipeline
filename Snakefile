@@ -46,8 +46,8 @@ rule all:
 # local rules for steps
 rule downloadSRR:
     output:
-        R1="fastq_input/{sample}_1.fastq.gz",
-        R2="fastq_input/{sample}_2.fastq.gz"
+        R1="fastq_input/{sample}_1.fastq",
+        R2="fastq_input/{sample}_2.fastq"
     log:
         "log/datacol_{sample}.log"
     conda:
@@ -55,7 +55,10 @@ rule downloadSRR:
     shell:
         """
         set -x
-        bash ./code/srr_download.sh
+        mkdir -p sra_raw fastq_input
+        prefetch {wildcards.sample} --output-directory sra_raw
+        fasterq-dump sra_raw/{wildcards.sample}/{wildcards.sample}.sra --threads 8 --outdir fastq_input
+        rm -r sra_raw/{wildcards.sample}
         """
 rule is_compressed:
     input:
@@ -99,6 +102,8 @@ rule run_trimmomatic:
             ILLUMINACLIP:{params.adapters}:2:30:10\
             MINLEN:{params.minlen} \
             > {log} 2>&1
+        rm -r {input.R1}
+        rm -r {input.R2}
         """
 
     
@@ -189,6 +194,8 @@ rule use_hisat:
         set -x
         mkdir -p final
         hisat2 -p 8 --dta -x {params.index} -1 {input.P1} -2 {input.P2} | samtools sort -o {output.o1}
+        rm -r {input.P1}
+        rm -r {input.P2}
         """
 
 rule use_featurecount:
