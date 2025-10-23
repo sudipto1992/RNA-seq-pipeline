@@ -3,6 +3,7 @@ downloadSRR: True
 
 samples:
   - SRR24597727
+  - SRR24597728
 
 ## Gtf input
 gtf_file: "annotation/XENLA_10.1_Xenbase_2025-09-15.gtf"
