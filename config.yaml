@@ -1,12 +1,12 @@
 
-downloadSRR: True
+downloadSRR: False
 
 samples:
   - SRR24597727
   - SRR24597728
 
 ## Gtf input
-gtf_file: "annotation/XENLA_10.1_Xenbase_2025-09-15.gtf"
+gtf_file: "annotation/clean.gtf"
 
 ## Reference genome
 genome: "genome/XENLA_10.1_genome.fa"
@@ -16,16 +16,16 @@ genome: "genome/XENLA_10.1_genome.fa"
 iscompressed: False
 
 ## Check if your input is a fastq or a BAM
-from_fastq: True
+from_fastq: False
 
 ## trim adapter
-runtrimming: True
+runtrimming: False
 
 ## Check quality of fastq
 ## FastQC and MultiQC check
 
-gen_fastqc: True
-gen_multiqc: True
+gen_fastqc: False
+gen_multiqc: False
 
 ## Parameters for trimmomatic
 ## Adapter file
@@ -36,14 +36,14 @@ trimmotatic_minlen: 30
 
 ## Genome annotation and indexing
 ## Genome annotation includes generating exon and splice sites
-genome_anno: True
+genome_anno: False
 
-genome_build: True
+genome_build: False
 genome_index_dir: "genome_build"
 
 ## Alignment
 
-use_hisat: True
+use_hisat: False
 use_star: False
 
 ## Count table generation
