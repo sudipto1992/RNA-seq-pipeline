@@ -57,7 +57,8 @@ rule downloadSRR:
         set -x
         mkdir -p sra_raw fastq_input
         prefetch {wildcards.sample} --output-directory sra_raw
-        fasterq-dump sra_raw/{wildcards.sample}/{wildcards.sample}.sra --threads 8 --outdir fastq_input
+        fasterq-dump sra_raw/{wildcards.sample}/{wildcards.sample}.sra \
+        --threads 8 --outdir fastq_input > {log} 2>&1
         rm -r sra_raw/{wildcards.sample}
         """
 rule is_compressed:
@@ -102,8 +103,6 @@ rule run_trimmomatic:
             ILLUMINACLIP:{params.adapters}:2:30:10\
             MINLEN:{params.minlen} \
             > {log} 2>&1
-        rm -r {input.R1}
-        rm -r {input.R2}
         """
 
     
@@ -173,7 +172,8 @@ rule genome_build:
     shell:
         """
         set -x
-        hisat2-build -p 8 --ss {input.ss} --exon {input.exon} {input.fasta} {config[genome_index_dir]}/genome > {log} 2>&1
+        hisat2-build -p 8 --ss {input.ss} --exon {input.exon} \
+        {input.fasta} {config[genome_index_dir]}/genome > {log} 2>&1
         """
 
 rule use_hisat:
@@ -194,8 +194,6 @@ rule use_hisat:
         set -x
         mkdir -p final
         hisat2 -p 8 --dta -x {params.index} -1 {input.P1} -2 {input.P2} | samtools sort -o {output.o1}
-        rm -r {input.P1}
-        rm -r {input.P2}
         """
 
 rule use_featurecount:
